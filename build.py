@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
-
 import subprocess
 import os
 import sys
 import argparse
+import platform
 
 # Define the sound files
 def get_script_directory():
     return os.path.dirname(os.path.abspath(__file__))
 
+
 def play_sound(sound_file):
     script_dir = get_script_directory()
     sound_path = os.path.join(script_dir, sound_file)
-    # Redirect stdout and stderr to /dev/null to suppress output
-    # os.system(f"mpg123 -q {sound_path} > /dev/null 2>&1")
-    os.system(f"ffplay -nodisp -autoexit {sound_path} > /dev/null 2>&1")
+
+    if platform.system() == "Windows":
+        # Use start command for Windows
+        os.system(f'start "{sound_path}"')
+    else:
+        # Use ffplay for Linux
+        os.system(f"ffplay -nodisp -autoexit {sound_path} > /dev/null 2>&1")
 
 def run_cmake_generate(preset):
     try:

@@ -16,17 +16,24 @@ def play_sound(sound_file):
 
     if platform.system() == "Windows":
         # Use start command for Windows
-        os.system(f'start "{sound_path}"')
+        subprocess.Popen(['start', '', sound_path], shell=True)
     else:
         # Use ffplay for Linux
         os.system(f"ffplay -nodisp -autoexit {sound_path} > /dev/null 2>&1")
 
 def run_cmake_generate(preset):
     try:
-        command = f"cmake --preset {preset}"
+        if platform.system() == "Windows":
+            # a weird quirk with conan that we noticed
+            if preset == "conan-release":
+                preset = "conan-default"
+            command = f"cmake --preset {preset}"
+        else:
+            command = f"cmake --preset {preset}"
+
         result = subprocess.run(command, shell=True, check=True)
         # Command succeeded
-        if (preset == "conan-release"): 
+        if (preset in ["conan-release", "conan-default"]): 
             play_sound("sounds/release_generate_success.wav")
         elif (preset == "conan-debug"):
             play_sound("sounds/debug_generate_success.wav")
